@@ -27,6 +27,11 @@ class _HomePageState extends State<HomePage> {
   String? apepa = '';
   String? apema = '';
   String? photoname = '';
+  String? nameError;
+  String? apepaError;
+  String? apemaError;
+  String? phoneError;
+  String? emailError;
 
 
   //Update control
@@ -90,69 +95,127 @@ class _HomePageState extends State<HomePage> {
           verticalDirection: VerticalDirection.down,
           children: [
             const SizedBox(height: 10),
-            //TextFormField(
-            //controller: controlNumController,
-            //keyboardType: TextInputType.number,
-            //decoration: const InputDecoration(
-            //labelText: 'Control Number',
-            // ),
-            //validator: (val) => val!.isEmpty ? 'Enter Control Number' : null,
-            //onSaved: (val) => controlNumController.text = val!,
-            // ),
             TextFormField(
               controller: nameController,
               keyboardType: TextInputType.text,
-              decoration: const InputDecoration(
+              decoration: InputDecoration(
                 labelText: 'Name',
+                errorText: nameError,
               ),
-              validator: (val) => val!.isEmpty ? 'Enter Name' : null,
+              validator: (value){
+                String name = value ?? '';
+                if (name.isEmpty) {
+                  setState(() {
+                    nameError = 'El nombre es obligatorio';
+                  });
+                } else if (!RegExp(r'^[A-Za-z ]+$').hasMatch(name)){
+                  setState(() {
+                    nameError = 'Inserte un nombre valido';
+                  });
+                } else {
+                  setState(() {
+                    nameError = null;
+                  });
+                }
+              },
               onSaved: (val) => name = val!,
             ),
             TextFormField(
               controller: apepaController,
               keyboardType: TextInputType.text,
-              decoration: const InputDecoration(
+              decoration: InputDecoration(
                 labelText: 'Apellido Paterno',
+                errorText: apepaError,
               ),
-              validator: (val) => val!.isEmpty ? 'Ape Paterno' : null,
+              validator: (value){
+                String apepa = value ?? '';
+                if (apepa.isEmpty) {
+                  setState(() {
+                    apepaError = 'Introduzca el apellido paterno por favor';
+                  });
+                } else if (!RegExp(r'^[A-Za-z ]+$').hasMatch(apepa)) {
+                  setState(() {
+                    apepaError = 'Inserte un apellido valido';
+                  });
+                } else {
+                  setState(() {
+                    nameError = null;
+                  });
+                }
+              },
               onSaved: (val) => apepa = val!,
             ),
             TextFormField(
               controller: apemaController,
               keyboardType: TextInputType.text,
-              decoration: const InputDecoration(
+              decoration: InputDecoration(
                 labelText: 'Apellido Materno',
+                errorText: apemaError,
               ),
-              validator: (val) => val!.isEmpty ? 'Ape Materno' : null,
+              validator: (value){
+                String apema = value ?? '';
+                if (apema.isEmpty) {
+                  setState(() {
+                    apemaError = 'Inserte el apellido materno';
+                  });
+                } else if (!RegExp(r'^[A-Za-z ]+$').hasMatch(apema)) {
+                  setState((){
+                    apemaError = 'Inserte un apellido valido';
+                  });
+                } else {
+                  setState(() {
+                    apemaError = null;
+                  });}
+              },
               onSaved: (val) => apema = val!,
             ),
             TextFormField(
               controller: telController,
               keyboardType: TextInputType.text,
-              decoration: const InputDecoration(
+              decoration: InputDecoration(
                 labelText: 'Telefono',
+                errorText: phoneError,
               ),
               validator: (value) {
-                if (value!.isEmpty || value.length < 10) {
-                  return "Please enter a correct telefono";
+                String phone = value ?? '';
+                if (phone.isEmpty) {
+                  setState(() {
+                    phoneError = 'Introduzca su numero';
+                  });
+                } else if (!RegExp(r'^[0-9]{10}$').hasMatch(phone)){
+                  setState((){
+                    phoneError = 'Telefono no valido';
+                  });
+                } else {
+                  setState(() {
+                    phoneError = null;
+                  });
                 }
-                return null;
               },
-              onSaved: (val) => tel = val!,
+              onSaved: (value) => tel = value,
             ),
             TextFormField(
               controller: emailController,
               keyboardType: TextInputType.text,
-              decoration: const InputDecoration(
+              decoration: InputDecoration(
                 labelText: 'Email',
+                errorText: emailError,
               ),
-              validator: (value) {
-                if (value!.isEmpty ||
-                    !RegExp(r"^[a-zA-Z0-9.a-zA-Z0-9!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
-                        .hasMatch(value)) {
-                  return "Por favor, ingresa un correo electrónico válido";
+              validator: (value){
+                String email = value ?? '';
+                if (email.isEmpty) {
+                  setState(() {
+                    emailError = 'Ingresa tu correo por favor';
+                  });
+                } else if (!RegExp(r'^[\w-]+(\.[\w-]+)*@[\w-]+(\.[\w-]+)+$').hasMatch(email)) {
+                  setState(() {
+                    emailError = 'Correo electronico no valido';
+                  });
+                } else {
+                  setState(() {
+                    emailError = null;
+                  });
                 }
-                return null;
               },
               onSaved: (value) => email = value,
             ),
@@ -198,51 +261,51 @@ class _HomePageState extends State<HomePage> {
         ],
         rows: Studentss!
             .map((student) => DataRow(cells: [
-                  DataCell(
-                      Container(
-                        width: 80,
-                        height: 120,
-                        child:
-                            Utility.ImageFromBase64String(student.photoName!),
-                      ), onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => imageInfo(
-                              photo: student.photoName,
-                              name: student.name,
-                              apepa: student.apepa,
-                              apema: student.apema,
-                              email: student.email,
-                              tel: student.tel)),
-                    );
-                  }),
-                  DataCell(Text(student.name!), onTap: () {
-                    setState(() {
-                      // En caso de que se actualice
-                      isUpdating = true;
-                      // Obtiene el ID y la Imagen del registro seleccionado
-                      currentUserId = student.controlNum;
-                      image = student.photoName;
-                    });
-                    nameController.text = student.name!;
-                    apepaController.text = student.apepa!;
-                    apemaController.text = student.apema!;
-                    emailController.text = student.email!;
-                    telController.text = student.tel!;
-                  }),
-                  DataCell(Text(student.apepa!)),
-                  DataCell(Text(student.apema!)),
-                  DataCell(Text(student.email!)),
-                  DataCell(Text(student.tel!)),
-                  DataCell(IconButton(
-                    onPressed: () {
-                      dbHelper.delete(student.controlNum);
-                      refreshList();
-                    },
-                    icon: const Icon(Icons.delete),
-                  ))
-                ]))
+          DataCell(
+              Container(
+                width: 80,
+                height: 120,
+                child:
+                Utility.ImageFromBase64String(student.photoName!),
+              ), onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => imageInfo(
+                      photo: student.photoName,
+                      name: student.name,
+                      apepa: student.apepa,
+                      apema: student.apema,
+                      email: student.email,
+                      tel: student.tel)),
+            );
+          }),
+          DataCell(Text(student.name!), onTap: () {
+            setState(() {
+              // En caso de que se actualice
+              isUpdating = true;
+              // Obtiene el ID y la Imagen del registro seleccionado
+              currentUserId = student.controlNum;
+              image = student.photoName;
+            });
+            nameController.text = student.name!;
+            apepaController.text = student.apepa!;
+            apemaController.text = student.apema!;
+            emailController.text = student.email!;
+            telController.text = student.tel!;
+          }),
+          DataCell(Text(student.apepa!)),
+          DataCell(Text(student.apema!)),
+          DataCell(Text(student.email!)),
+          DataCell(Text(student.tel!)),
+          DataCell(IconButton(
+            onPressed: () {
+              dbHelper.delete(student.controlNum);
+              refreshList();
+            },
+            icon: const Icon(Icons.delete),
+          ))
+        ]))
             .toList(),
       ),
     );
@@ -251,19 +314,19 @@ class _HomePageState extends State<HomePage> {
   Widget list() {
     return Expanded(
         child: SingleChildScrollView(
-      child: FutureBuilder(
-          future: Studentss,
-          builder: (context, AsyncSnapshot<dynamic> snapshot) {
-            if (snapshot.hasData) {
-              print(snapshot.data);
-              return userDataTable(snapshot.data);
-            }
-            if (!snapshot.hasData) {
-              print("Data Not Found");
-            }
-            return const CircularProgressIndicator();
-          }),
-    ));
+          child: FutureBuilder(
+              future: Studentss,
+              builder: (context, AsyncSnapshot<dynamic> snapshot) {
+                if (snapshot.hasData) {
+                  print(snapshot.data);
+                  return userDataTable(snapshot.data);
+                }
+                if (!snapshot.hasData) {
+                  print("Data Not Found");
+                }
+                return const CircularProgressIndicator();
+              }),
+        ));
   }
 
   validate() {
