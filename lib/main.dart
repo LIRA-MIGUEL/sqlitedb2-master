@@ -8,7 +8,7 @@ void main() {
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({Key? key});
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -17,12 +17,12 @@ class MyApp extends StatelessWidget {
     );
   }
 }
-
+// Commit de verificación
 class FingerPrint extends StatefulWidget {
-  const FingerPrint({Key? key});
+  const FingerPrint({Key? key}) : super(key: key);
 
   @override
-  _FingerPrintState createState() => _FingerPrintState();
+  State<FingerPrint> createState() => _FingerPrintState();
 }
 
 class _FingerPrintState extends State<FingerPrint> {
@@ -31,7 +31,7 @@ class _FingerPrintState extends State<FingerPrint> {
   List<BiometricType> _availableBiometric = [];
   String authorized = "Not Authorized";
 
-  Future<void> _checkBiometric() async {
+  Future<void> _CheckBiometric() async {
     bool canCheckBiometric = false;
     try {
       canCheckBiometric = await auth.canCheckBiometrics;
@@ -45,117 +45,108 @@ class _FingerPrintState extends State<FingerPrint> {
     });
   }
 
-  void _allowAccessWithoutFingerprint() {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => HomePage(),
-      ),
-    );
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    _checkBiometric();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
-        body: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Column(
-            children: <Widget>[
-              const Center(
-                child: Text(
-                  "Login",
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 48.0,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-              Container(
-                margin: const EdgeInsets.symmetric(
-                  vertical: 50.0,
-                ),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    Image.asset(
-                      'assets/dedo.png',
-                      width: 200,
-                      height: 200,
-                    ),
-                    const SizedBox(
-                      height: 50,
-                    ),
-                    const Text("Acceso solo con huella digital"),
-                    Container(
-                      margin: const EdgeInsets.symmetric(
-                        vertical: 15.0,
-                      ),
-                      width: double.infinity,
-                      child: MaterialButton(
-                        elevation: 0.0,
-                        color: Colors.white,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(30.0),
-                        ),
-                        onPressed: () {
-                          if (_canCheckBiometric) {
-                            _authenticate();
-                          } else {
-                            _allowAccessWithoutFingerprint();
-                          }
-                        },
-                        child: const Padding(
-                          padding: EdgeInsets.symmetric(
-                              vertical: 14.0, horizontal: 24.0),
-                          child: Text(
-                            "Login",
-                            style: TextStyle(color: Colors.blue),
-                          ),
-                        ),
-                      ),
-                    )
-                  ],
-                ),
-              )
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Future<void> _authenticate() async {
-    bool authenticated = false;
+  Future<void> _getAvailableBiometrics() async {
+    List<BiometricType> availableBiometric = [];
     try {
-      authenticated = await auth.authenticate(
-        localizedReason: "Coloca tu dedo en el lector de huellas",
-      );
+      availableBiometric = await auth.getAvailableBiometrics();
     } on PlatformException catch (e) {
       print(e);
     }
     if (!mounted) return;
 
     setState(() {
-      authorized = authenticated ? "Autenticado con éxito" : "Falla al leer la huella";
+      _availableBiometric = availableBiometric;
+    });
+  }
+
+  Future<void> _authenticate() async {
+    bool authenticated = false;
+    try {
+      authenticated = await auth.authenticate(
+          localizedReason: "Coloca tu dedo en el lector de huellas ",
+          options: const AuthenticationOptions(
+            useErrorDialogs: true,
+            stickyAuth: true,
+          ));
+    } on PlatformException catch (e) {
+      print(e);
+    }
+    if (!mounted) return;
+
+    setState(() {
+      authorized =
+      authenticated ? "Autenticado con éxito" : "Falla al leer la huella";
 
       if (authenticated) {
         Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => HomePage(),
-          ),
-        );
+            context, MaterialPageRoute(builder: (context) => HomePage()));
       }
     });
   }
-}
 
+  @override
+  Widget build(BuildContext context) {
+    return SafeArea(
+        child: Scaffold(
+          body: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Column(
+              children: <Widget>[
+                const Center(
+                  child: Text(
+                    "Login",
+                    style: TextStyle(
+                        color: Colors.pinkAccent,
+                        fontSize: 48.0,
+                        fontWeight: FontWeight.bold),
+                  ),
+                ),
+                Container(
+                  margin: const EdgeInsets.symmetric(
+                    vertical: 50.0,
+                  ),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      Image.asset(
+                        'assets/dedo.png',
+                        //Comentario de prueba
+                        width: 200,
+                        height: 200,
+                      ),
+                      const SizedBox(
+                        height: 50,
+                      ),
+                      const Text("Acceso solo con huella digital"),
+                      Container(
+                        margin: const EdgeInsets.symmetric(
+                          vertical: 15.0,
+                        ),
+                        width: double.infinity,
+                        child: MaterialButton(
+                          elevation: 0.0,
+                          color: Colors.black,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(30.0),
+                          ),
+                          onPressed: _authenticate,
+                          child: const Padding(
+                            padding: EdgeInsets.symmetric(
+                                vertical: 14.0, horizontal: 24.0),
+                            child: Text(
+                              "Login",
+                              style: TextStyle(color: Colors.greenAccent),
+                            ),
+                          ),
+                        ),
+                      )
+                    ],
+                  ),
+                )
+              ],
+            ),
+          ),
+        ));
+  }
+}
 

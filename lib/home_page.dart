@@ -1,5 +1,5 @@
 import 'dart:typed_data';
-import 'image_info.dart';
+import 'info.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:sqlitedb2/convert_utility.dart';
@@ -102,13 +102,13 @@ class _HomePageState extends State<HomePage> {
                 labelText: 'Name',
                 errorText: nameError,
               ),
-              validator: (value){
+              validator: (value) {
                 String name = value ?? '';
                 if (name.isEmpty) {
                   setState(() {
                     nameError = 'El nombre es obligatorio';
                   });
-                } else if (!RegExp(r'^[A-Za-z ]+$').hasMatch(name)){
+                } else if (!RegExp(r'^[A-Za-z ]+$').hasMatch(name)) {
                   setState(() {
                     nameError = 'Inserte un nombre valido';
                   });
@@ -127,7 +127,7 @@ class _HomePageState extends State<HomePage> {
                 labelText: 'Apellido Paterno',
                 errorText: apepaError,
               ),
-              validator: (value){
+              validator: (value) {
                 String apepa = value ?? '';
                 if (apepa.isEmpty) {
                   setState(() {
@@ -152,20 +152,21 @@ class _HomePageState extends State<HomePage> {
                 labelText: 'Apellido Materno',
                 errorText: apemaError,
               ),
-              validator: (value){
+              validator: (value) {
                 String apema = value ?? '';
                 if (apema.isEmpty) {
                   setState(() {
                     apemaError = 'Inserte el apellido materno';
                   });
                 } else if (!RegExp(r'^[A-Za-z ]+$').hasMatch(apema)) {
-                  setState((){
+                  setState(() {
                     apemaError = 'Inserte un apellido valido';
                   });
                 } else {
                   setState(() {
                     apemaError = null;
-                  });}
+                  });
+                }
               },
               onSaved: (val) => apema = val!,
             ),
@@ -182,8 +183,8 @@ class _HomePageState extends State<HomePage> {
                   setState(() {
                     phoneError = 'Introduzca su numero';
                   });
-                } else if (!RegExp(r'^[0-9]{10}$').hasMatch(phone)){
-                  setState((){
+                } else if (!RegExp(r'^[0-9]{10}$').hasMatch(phone)) {
+                  setState(() {
                     phoneError = 'Telefono no valido';
                   });
                 } else {
@@ -201,13 +202,15 @@ class _HomePageState extends State<HomePage> {
                 labelText: 'Email',
                 errorText: emailError,
               ),
-              validator: (value){
+              validator: (value) {
                 String email = value ?? '';
                 if (email.isEmpty) {
                   setState(() {
                     emailError = 'Ingresa tu correo por favor';
                   });
-                } else if (!RegExp(r'^[\w-]+(\.[\w-]+)*@[\w-]+(\.[\w-]+)+$').hasMatch(email)) {
+                } else
+                if (!RegExp(r'^[\w-]+(\.[\w-]+)*@[\w-]+(\.[\w-]+)+$').hasMatch(
+                    email)) {
                   setState(() {
                     emailError = 'Correo electronico no valido';
                   });
@@ -260,52 +263,54 @@ class _HomePageState extends State<HomePage> {
           DataColumn(label: Text('Delete')),
         ],
         rows: Studentss!
-            .map((student) => DataRow(cells: [
-          DataCell(
-              Container(
-                width: 80,
-                height: 120,
-                child:
-                Utility.ImageFromBase64String(student.photoName!),
-              ), onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder: (context) => imageInfo(
-                      photo: student.photoName,
-                      name: student.name,
-                      apepa: student.apepa,
-                      apema: student.apema,
-                      email: student.email,
-                      tel: student.tel)),
-            );
-          }),
-          DataCell(Text(student.name!), onTap: () {
-            setState(() {
-              // En caso de que se actualice
-              isUpdating = true;
-              // Obtiene el ID y la Imagen del registro seleccionado
-              currentUserId = student.controlNum;
-              image = student.photoName;
-            });
-            nameController.text = student.name!;
-            apepaController.text = student.apepa!;
-            apemaController.text = student.apema!;
-            emailController.text = student.email!;
-            telController.text = student.tel!;
-          }),
-          DataCell(Text(student.apepa!)),
-          DataCell(Text(student.apema!)),
-          DataCell(Text(student.email!)),
-          DataCell(Text(student.tel!)),
-          DataCell(IconButton(
-            onPressed: () {
-              dbHelper.delete(student.controlNum);
-              refreshList();
-            },
-            icon: const Icon(Icons.delete),
-          ))
-        ]))
+            .map((student) =>
+            DataRow(cells: [
+              DataCell(
+                  Container(
+                    width: 80,
+                    height: 120,
+                    child:
+                    Utility.ImageFromBase64String(student.photoName!),
+                  ), onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) =>
+                          imageInfo(
+                              photo: student.photoName,
+                              name: student.name,
+                              apepa: student.apepa,
+                              apema: student.apema,
+                              email: student.email,
+                              tel: student.tel)),
+                );
+              }),
+              DataCell(Text(student.name!), onTap: () {
+                setState(() {
+                  // En caso de que se actualice
+                  isUpdating = true;
+                  // Obtiene el ID y la Imagen del registro seleccionado
+                  currentUserId = student.controlNum;
+                  image = student.photoName;
+                });
+                nameController.text = student.name!;
+                apepaController.text = student.apepa!;
+                apemaController.text = student.apema!;
+                emailController.text = student.email!;
+                telController.text = student.tel!;
+              }),
+              DataCell(Text(student.apepa!)),
+              DataCell(Text(student.apema!)),
+              DataCell(Text(student.email!)),
+              DataCell(Text(student.tel!)),
+              DataCell(IconButton(
+                onPressed: () {
+                  dbHelper.delete(student.controlNum);
+                  refreshList();
+                },
+                icon: const Icon(Icons.delete),
+              ))
+            ]))
             .toList(),
       ),
     );
@@ -390,11 +395,11 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        // Evitar botón de regreso
         automaticallyImplyLeading: false,
-        title: const Text('SQLite DB'),
+        title: const Text('SQLiteBD'),
         centerTitle: true,
       ),
+      backgroundColor: Colors.pinkAccent, // Cambia 'Colors.blue' al color que desees
       body: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         mainAxisSize: MainAxisSize.min,
